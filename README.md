@@ -1,2 +1,2 @@
 # BusyCaliSPA
-Busy Cali SPA
+Busy Cali Single Page Application
