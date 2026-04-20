@@ -3,197 +3,293 @@
 // ==========================
 
 const state = {
-  user: null,
-  isLoading: false
+  loggedIn: localStorage.getItem('busycali_loggedin') === 'true',
+  currentScreen: 'intro',
+  goal: localStorage.getItem('busycali_goal') || null,
+  time: localStorage.getItem('busycali_time') || null
 };
 
-// ==========================
-// 2. Navigation Component
-// ==========================
 
-function Nav() {
-  return `
-    <nav>
-      <div class="nav-left">
-        <a href="#/">Home</a>
-        <a href="#/about">About</a>
-        ${state.user ? `<a href="#/dashboard">Dashboard</a>` : ''}
-      </div>
-      <div class="nav-right">
-        ${state.user 
-          ? `<a href="#" id="logoutLink">Logout</a>` 
-          : `<a href="#/login">Login</a>`}
-      </div>
-    </nav>
-  `;
-}
 // ==========================
-// 3. Route Map
+// 2. Routes
 // ==========================
 
 const routes = {
-  '#/': Home,
-  '#/login': LogIn,
-  '#/dashboard': Dashboard,
-  '#/about': About
+  intro:      IntroPage,
+  signin:     SignInPage,
+  signup:     SignUpPage,
+  onboarding: OnboardingPage,
+  home:       HomePage,
+  workouts:   WorkoutsPage,
+  progress:   ProgressPage,
+  about:      AboutPage,
+  profile:    ProfilePage
 };
 
-// Define protected routes list (what's behind the login)
-const protectedRoutes = ['#/dashboard'];
 
-function router() {
-  const hash = window.location.hash || '#/';
+// ==========================
+// 3. Router & Render
+// ==========================
 
-  // Route guard:
-  // If the current route is one of the protected routes AND there is no logged-in user, 
-  // redirect the user to the login page.
-  if (protectedRoutes.includes(hash) && !state.user) {
-    window.location.hash = '#/login';
-    return;
-  }
-
+function navigate(screen) {
+  state.currentScreen = screen;
   render();
 }
-
-// ==========================
-// 4. Render Engine - what is being showed on the document (html)
-// ==========================
 
 function render() {
   const app = document.getElementById('app');
   const nav = document.getElementById('nav');
 
-  nav.innerHTML = Nav();  //  display nav every time
+  nav.innerHTML = state.loggedIn ? Nav() : '';
 
-  if (state.isLoading) {
-    app.innerHTML = `<p>Loading...</p>`;
-    return;
-  }
+  const page = routes[state.currentScreen] || IntroPage;
+  app.innerHTML = page();
 
-// Get the function from the routes object that matches the current URL hash
-// (defaulting to '#/' if no hash exists).
-// If a matching route function is found, render it.
-// Otherwise, display the 404 message.
-  const page = routes[window.location.hash || '#/'];
-  app.innerHTML = page ? page() : `<h1>404 <br><br> Page does not exist</h1>`;
+  document.querySelectorAll('#nav button').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.screen === state.currentScreen)
+  );
 
-  attachEvents();
+  attachListeners();
 }
 
-// ==========================
-// 5. Pages Components
-// ==========================
-// here if (state.user) checks if the user is logged in or not
 
-function Home() {
-  if (state.user) {
-    return `
-      <h1>Welcome back, <span style="color: #0593f2;">${state.user}</span></h1>
-      <p> This is the Home page when the user is logged in </p>
-    `;
-  }
+// ==========================
+// 4. Nav Component
+// ==========================
 
+function Nav() {
+  const tabs = [
+    { screen: 'home',     label: 'Home', icon:'' },
+    { screen: 'workouts', label: 'Routines', icon:'' },
+    { screen: 'progress', label: 'Progress',  icon:'' },
+    { screen: 'profile',    label: 'Profile', icon:''}
+  ];
   return `
-    <h1>Welcome</h1>
-    <p>This is the Home Page</p>
+    <nav aria-label="Main navigation">
+      ${tabs.map(t => `
+        <button data-screen="${t.screen}" onclick="navigate('${t.screen}')">
+          <span class="tab-icon">${t.icon}</span>
+          <span>${t.label}</span>
+        </button>
+      `).join('')}
+    </nav>
   `;
 }
 
 
-function LogIn() {
-  if (state.user) {
-    return `
-      <h1>Welcome back, <span style="color: #0593f2;">${state.user}</span></h1>
-      <button id="logoutBtn">Logout</button>
-    `;
-  }
+// ==========================
+// 5. Reusable Field Component
+// ==========================
 
+function Field(id, label, type, placeholder) {
   return `
-    <h1>Login</h1>
-    <input id="username" placeholder="Username"> <br> <br>
-    <input id="password" type="password" placeholder="Password"> <br><br>
-    <button id="loginBtn">Login</button>
+    <div class="form-group">
+      <label for="${id}">${label}</label>
+      <input type="${type}" id="${id}" placeholder="${placeholder}" required />
+    </div>
   `;
 }
 
-function Dashboard() {
+
+// ==========================
+// 6. Page Components
+// ==========================
+
+function IntroPage() {
   return `
-    <h1><span style="color: #0593f2;">${state.user}'s </span>Dashboard</h1>
-    <p>Protected content. User must be logged in to view this page</p>
+    <section class="intro-screen" aria-label="Welcome">
+      <div class="intro-content">
+        <img src="resources/images/logo.png" alt="BusyCali logo" class="intro-logo" />
+        <p class="tagline">Calisthenics. Built for busy people.</p>
+      </div>
+      <div class="intro-buttons">
+        <button class="btn-primary" id="btn-create">Create Account</button>
+        <button class="btn-secondary" id="btn-login">Log In</button>
+      </div>
+    </section>
   `;
 }
 
-function About() {
+function SignInPage() {
   return `
-  <h1>About Page</h1>
-  <p> Some information about the app</p>`;
+    <section aria-label="Sign in">
+      <button class="back-btn" id="btn-back">&#8592; Back</button>
+      <h1>Welcome Back</h1>
+      <form id="signin-form" novalidate>
+        ${Field('signin-email', 'Username', 'text', 'mayra@example.com')}
+        ${Field('signin-password', 'Password', 'password', '••••••••••')}
+        <p id="form-error" class="error-msg"></p>
+        <button type="submit" class="btn-primary">Log In</button>
+      </form>
+      <p class="switch-link">No account? <span id="go-signup">Sign Up</span></p>
+    </section>
+  `;
 }
 
+function SignUpPage() {
+  return `
+    <section aria-label="Sign up">
+      <button class="back-btn" id="btn-back">&#8592; Back</button>
+      <h1>Create Account</h1>
+      <form id="signup-form" novalidate>
+        ${Field('signup-username', 'Username', 'text', 'e.g. christian99')}
+        ${Field('signup-email', 'Email', 'email', 'mayra@example.com')}
+        ${Field('signup-password', 'Password', 'password', '••••••••••')}
+        <p id="form-error" class="error-msg"></p>
+        <button type="submit" class="btn-primary">Sign Up</button>
+      </form>
+      <p class="switch-link">Have an account? <span id="go-signin">Log In</span></p>
+    </section>
+  `;
+}
+
+function OnboardingPage() {
+  return `
+    <section aria-label="Quick setup">
+      <h1>Quick Setup</h1>
+      <p class="onboarding-sub">Takes 10 seconds</p>
+      <p class="onboarding-label">Select a Goal</p>
+      <div class="pill-group" id="goal-pills">
+        ${['Strength', 'Learn Calisthenics', 'Consistency'].map(g => `
+          <button class="pill" data-value="${g.toLowerCase()}">${g}</button>
+        `).join('')}
+      </div>
+      <p class="onboarding-label">Time per session?</p>
+      <div class="pill-group" id="time-pills">
+        ${['20', '30', '45'].map(t => `
+          <button class="pill" data-value="${t}">${t} min</button>
+        `).join('')}
+      </div>
+      <button class="btn-primary" id="btn-go" disabled>Go!</button>
+    </section>
+  `;
+}
+
+function HomePage() {
+  const user = JSON.parse(localStorage.getItem('busycali_user'));
+  const name = user?.username || 'there';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  return `
+    <section aria-label="Home">
+      <h1>${greeting}, ${name}</h1>
+      <p class="greeting-sub">Ready for a workout?</p>
+    </section>
+  `;
+}
+
+function WorkoutsPage() {
+  return `<section aria-label="Workouts"><h1>Routines</h1><p>Coming soon.</p></section>`;
+}
+
+function ProgressPage() {
+  return `<section aria-label="Progress"><h1>Progress</h1><p>Coming soon.</p></section>`;
+}
+function ProfilePage() {
+  return `<section aria-label="Progress"><h1>Profile</h1><p>Coming soon.</p></section>`;
+}
+
+function AboutPage() {
+  return `<section aria-label="About"><h1>About BusyCali</h1><p>Coming soon.</p></section>`;
+}
+
+
 // ==========================
-// 6. Event Binding
+// 7. Event Listeners
 // ==========================
 
-function attachEvents() {
+function attachListeners() {
+  const get = id => document.getElementById(id);
 
-  const loginBtn = document.getElementById('loginBtn');
-  if (loginBtn) loginBtn.addEventListener('click', login);
+  get('btn-create')  ?.addEventListener('click',  () => navigate('signup'));
+  get('btn-login')   ?.addEventListener('click',  () => navigate('signin'));
+  get('btn-back')    ?.addEventListener('click',  () => navigate('intro'));
+  get('go-signup')   ?.addEventListener('click',  () => navigate('signup'));
+  get('go-signin')   ?.addEventListener('click',  () => navigate('signin'));
+  get('signin-form') ?.addEventListener('submit', handleSignIn);
+  get('signup-form') ?.addEventListener('submit', handleSignUp);
+  get('btn-go')      ?.addEventListener('click',  handleOnboarding);
 
-  const logoutLink = document.getElementById('logoutLink');
-  if (logoutLink) {
-    logoutLink.addEventListener('click', (e) => {
-      e.preventDefault(); // e is the event object; preventDefault() stops the element’s default browser behavior (like following a link)
-      logout();
+  ['goal-pills', 'time-pills'].forEach(groupId => {
+    document.querySelectorAll(`#${groupId} .pill`).forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll(`#${groupId} .pill`).forEach(p => p.classList.remove('selected'));
+        pill.classList.add('selected');
+        checkOnboardingReady();
+      });
     });
-  }
+  });
 }
 
 
-// =======7. Auth Logic======
-//   LOG IN LOGIC
+// ==========================
+// 8. Auth & Onboarding
 // ==========================
 
-function login() {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
+function handleSignUp(e) {
+  e.preventDefault();
+  const username = document.getElementById('signup-username').value.trim();
+  const email    = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
 
-  if (!username || !password) {
-    alert('Please fill in all fields');
-    return;
+  if (!username || !email || !password) {
+    return document.getElementById('form-error').textContent = 'Please fill in all fields.';
   }
 
-  // Here we have a fake delay and loading screen to simulate what happens if the server is awaiting a responce from an API
-  state.isLoading = true;
-  render();
-
-  setTimeout(() => {
-    state.user = username;   // we assing the global user state to the username entered during login
-    state.isLoading = false;
-    window.location.hash = '#/dashboard';
-  }, 800);
+  // localStorage: saving new user account on sign up
+  localStorage.setItem('busycali_user', JSON.stringify({ username, email, password }));
+  localStorage.setItem('busycali_loggedin', 'true');
+  state.loggedIn = true;
+  navigate('onboarding');
 }
 
-// =======7. Auth Logic======
-//   LOG OUT LOGIC
-// ==========================
+function handleSignIn(e) {
+  e.preventDefault();
+  const input    = document.getElementById('signin-email').value.trim();
+  const password = document.getElementById('signin-password').value;
 
+  // localStorage: retrieving stored user to validate login
+  const stored = JSON.parse(localStorage.getItem('busycali_user'));
 
-function logout() {
-  // Ask the user for confirmation
-  const confirmed = confirm("Do you really want to log out?");
-  if (!confirmed) return; // user cancelled
-
-  // If confirmed, proceed and change the global user state back to null
-  state.user = null;
-
-  if (window.location.hash === '#/login' || window.location.hash === '') {
-    render(); // re-render Home in logged-out state
+  if (stored && (stored.email === input || stored.username === input) && stored.password === password) {
+    localStorage.setItem('busycali_loggedin', 'true');
+    state.loggedIn = true;
+    navigate('home');
   } else {
-    window.location.hash = '#/login'; // redirect to Home
+    document.getElementById('form-error').textContent = 'Incorrect username or password.';
   }
 }
+
+function checkOnboardingReady() {
+  const goal = document.querySelector('#goal-pills .pill.selected');
+  const time = document.querySelector('#time-pills .pill.selected');
+  document.getElementById('btn-go').disabled = !(goal && time);
+}
+
+function handleOnboarding() {
+  const goal = document.querySelector('#goal-pills .pill.selected')?.dataset.value;
+  const time = document.querySelector('#time-pills .pill.selected')?.dataset.value;
+
+  // localStorage: saving goal and session time permanently for workout recommendations
+  localStorage.setItem('busycali_goal', goal);
+  localStorage.setItem('busycali_time', time);
+  state.goal = goal;
+  state.time = time;
+
+  navigate('home');
+}
+
+
 // ==========================
-// 8. Bootstrapping - App Start
+// 9. Init
 // ==========================
 
-window.addEventListener('hashchange', router);
-window.addEventListener('load', router);
+window.onload = () => {
+  if (state.loggedIn && state.goal) {
+    navigate('home');
+  } else if (state.loggedIn) {
+    navigate('onboarding');
+  } else {
+    navigate('intro');
+  }
+};
