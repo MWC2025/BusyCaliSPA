@@ -1,8 +1,8 @@
+/* Google Fonts font import*/
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;0,700;0,800;1,800&display=swap');
 
-/* ==========================
-   Base
-========================== */
+
+/* App Body */
 
 body {
   font-family: 'Montserrat', sans-serif;
@@ -13,167 +13,42 @@ body {
   max-width: 390px;
   margin: 0 auto;
   min-height: 100vh;
-  overflow-x: hidden;
+  
+ 
 }
+button{ 
+  font-family: 'Montserrat', sans-serif;
+  }
 
 #app {
+  font-family: 'Montserrat', sans-serif;
   padding: 24px 16px;
   padding-bottom: 90px;
 }
 
-h1 {
-  font-size: 26px;
-  font-weight: 800;
-  margin: 0 0 8px 0;
-}
-
-p {
-  margin: 0;
-}
 
 
-/* ==========================
-   Buttons
-========================== */
-
-.btn-primary {
-  width: 100%;
-  padding: 16px;
-  background: #4abfbf;
-  color: #ffffff;
-  border: none;
-  border-radius: 12px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 8px;
-  transition: background 0.2s;
-}
-
-.btn-primary:active  { background: #2e9a9a; }
-.btn-primary:disabled { background: #cccccc; cursor: not-allowed; }
-
-.btn-secondary {
-  width: 100%;
-  padding: 16px;
-  background: transparent;
-  color: #4abfbf;
-  border: 2px solid #4abfbf;
-  border-radius: 12px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 8px;
-}
-
-.back-btn {
-  background: none;
-  border: none;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  color: #4abfbf;
-  cursor: pointer;
-  padding: 0;
-  margin-bottom: 20px;
-  display: block;
-}
-
-
-/* ==========================
-   Forms
-========================== */
-
-.form-group {
+nav {
   display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
+  justify-content: space-between; /* left / right */
+  align-items: center;           /* vertically center links */
+  padding: 1rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
 }
 
-.form-group label {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  margin-bottom: 8px;
+.nav-left a,
+.nav-right a {
+  margin-right: 1rem;
+  text-decoration: none;
+  color: #333;
 }
 
-.form-group input {
-  padding: 14px 16px;
-  border: 1.5px solid #cccccc;
-  border-radius: 12px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 15px;
-  outline: none;
-  transition: border-color 0.2s;
+.nav-left a:last-child,
+.nav-right a:last-child {
+  margin-right: 0; /* remove margin from last link in each group */
 }
 
-.form-group input:focus { border-color: #4abfbf; }
-
-.error-msg {
-  color: #e53e3e;
-  font-size: 13px;
-  font-weight: 600;
-  min-height: 18px;
-  margin-bottom: 8px;
+nav a:hover {
+  text-decoration: underline;
 }
-
-.switch-link {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 14px;
-  color: #666666;
-}
-
-.switch-link span {
-  color: #4abfbf;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-
-/* ==========================
-   Intro Screen
-========================== */
-
-.intro-screen {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: calc(100vh - 48px);
-}
-
-.intro-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  text-align: center;
-  padding: 40px 0 24px;
-}
-
-.intro-logo {
-  width: 200px;
-  margin-bottom: 16px;
-}
-
-.tagline {
-  font-size: 15px;
-  font-weight: 600;
-  color: #666666;
-}
-
-.intro-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding-bottom: 16px;
-}
-
-
-/* ==========================
-   Onboarding Screen
-==========================
