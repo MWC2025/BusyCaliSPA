@@ -143,6 +143,7 @@ function LogIn() {
     
     <input id="username" placeholder="Username"> <br> <br>
     <input id="password" type="password" placeholder="Password"> <br><br>
+    <p id="loginError" style="color:red; font-size:0.85rem;"></p>
     <button id="loginBtn">Login</button>
   `;
 }
@@ -152,11 +153,14 @@ function SignUp() {
     <button id="Back">Back</button>  
     <h1>Create Account</h1>
 
-    <input id="username" placeholder="Username"> <br> <br>
-    <input id="email" placeholder="Email"> <br> <br>
+    <input id="name" placeholder="Name"> <br><br>
+    <input id="username" placeholder="Username"> <br><br>
+    <input id="email" placeholder="Email"> <br><br>
     <input id="password" type="password" placeholder="Password"> <br><br>
-    <button id="onbNext">Next</button>
-    <p>Already have an account?<a href="#/login">Login</a></p> `;
+    <p id="signupError" style="color:red; font-size:0.85rem;"></p>
+    <button id="signupBtn">Next</button>
+    <p>Already have an account? <a href="#/login">Login</a></p>
+  `;
 }
 
 function Home() {
@@ -236,11 +240,7 @@ if (BackLgn) { BackLgn.addEventListener('click', () => {
     window.location.hash = '#/';
   });
 }
-const onbNext = document.getElementById('onbNext');
-if (onbNext) { onbNext.addEventListener('click', () => {
-    window.location.hash = '#/onboarding';
-  });
-}
+
 const logoutLink = document.getElementById('logoutLink');
 if (logoutLink) {
   logoutLink.addEventListener('click', (e) => {
@@ -248,7 +248,11 @@ if (logoutLink) {
     logout();
   });
   }
+
+const signupBtn = document.getElementById('signupBtn'); 
+if (signupBtn) signupBtn.addEventListener('click', signup); 
 }
+
 
 
 
@@ -258,13 +262,19 @@ if (logoutLink) {
 function login() {
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
+  const users = getUsers();
 
+//validation check
   if (!username || !password) {
     alert('Please fill in all fields');
     return;
   }
 
-  // Here we have a fake delay and loading screen to simulate what happens if the server is awaiting a responce from an API
+  if (!users[username] || users[username].password !== password) {
+    document.getElementById('loginError').textContent = 'no account found!';
+    return;
+  }
+  //  fake delay and loading screen 
   state.isLoading = true;
   render();
 
@@ -289,12 +299,40 @@ function logout() {
   // If confirmed, proceed and change the global user state back to null
   state.user = null;
   localStorage.removeItem('current_user');
-  
+
   if (window.location.hash === '#/login' || window.location.hash === '') {
     render(); // re-render Home in logged-out state
   } else {
     window.location.hash = '#/login'; // redirect to Home
   }
+}
+
+
+// sign up logic
+
+function signup(){
+  const name = document.getElementById('name').value;
+  const username = document.getElementById('username').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  if ( !name || !username || !password ||!email ) {
+    document.getElementById('signupError').textContent = 'Please fill in all fields';
+    return;
+  }
+
+ const users = getUsers();
+  if (users[username]) {
+    document.getElementById('signupError').textContent = 'Username already taken';
+    return;
+  }
+
+  users[username] = { name, email, password };
+  saveUsers(users);
+
+  state.user = username;
+  localStorage.setItem('current_user', username);
+  window.location.hash = '#/onboarding';
 }
 
 // Bootstrapping - App Start
