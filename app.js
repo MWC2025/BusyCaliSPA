@@ -241,12 +241,12 @@ if (onbNext) { onbNext.addEventListener('click', () => {
     window.location.hash = '#/onboarding';
   });
 }
-  const logoutLink = document.getElementById('logoutLink');
-  if (logoutLink) {
-    logoutLink.addEventListener('click', (e) => {
-      e.preventDefault(); // e is the event object; preventDefault() stops the element’s default browser behavior (like following a link)
-      logout();
-    });
+const logoutLink = document.getElementById('logoutLink');
+if (logoutLink) {
+  logoutLink.addEventListener('click', (e) => {
+    e.preventDefault(); // e is the event object; preventDefault() stops the element’s default browser behavior (like following a link)
+    logout();
+  });
   }
 }
 
@@ -269,7 +269,8 @@ function login() {
   render();
 
   setTimeout(() => {
-    state.user = username;   // we assing the global user state to the username entered during login
+    state.user = username;   // adding the global user state to the username entered during login
+    localStorage.setItem('current_user', username);
     state.isLoading = false;
     window.location.hash = '#/dashboard';
   }, 800);
@@ -287,7 +288,8 @@ function logout() {
 
   // If confirmed, proceed and change the global user state back to null
   state.user = null;
-
+  localStorage.removeItem('current_user');
+  
   if (window.location.hash === '#/login' || window.location.hash === '') {
     render(); // re-render Home in logged-out state
   } else {
@@ -299,4 +301,8 @@ function logout() {
 
 
 window.addEventListener('hashchange', router);
-window.addEventListener('load', router);
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('current_user');
+  if (saved) state.user = saved;
+  router();
+});
