@@ -1,15 +1,44 @@
-// ==========================
-// 1. Global State
-// ==========================
+//state
 
 const state = {
   user: null,
   isLoading: false
 };
 
-// ==========================
-// 2. Navigation Component
-// ==========================
+// Local Storage
+
+function getUsers(){
+  return JSON.parse(localStorage.getItem('usersList') || '{}');
+}
+
+function saveUsers(users){
+  localStorage.setItem('usersList', JSON.stringify(users));
+}
+
+function getProfile(username){
+  const all = JSON.parse(localStorage.getItem('profileList') || '{}');  
+  return all[username]|| {};
+}
+
+function saveProfile(username, info){
+  const all = JSON.parse(localStorage.getItem('profileList') || '{}');  
+  all[username] = info;
+  localStorage.setItem('profileList', JSON.stringify(all));
+}
+
+
+function getWorkouts(username){
+  const all = JSON.parse(localStorage.getItem('workoutList') || '{}');  
+  return all[username]|| [];
+}
+
+function saveWorkouts(username, workouts){
+  const all = JSON.parse(localStorage.getItem('workoutList') || '{}');  
+  all[username] = workouts;
+  localStorage.setItem('workoutList', JSON.stringify(all));
+}
+
+// Navigation
 
 function Nav() {
   return `
@@ -28,10 +57,8 @@ function Nav() {
     </nav>
   `;
 }
-// ==========================
-// 3. Route Map
-// ==========================
 
+//Route list
 const routes = {
   '#/': Intro,
   '#/login': LogIn,
@@ -44,7 +71,7 @@ const routes = {
   '#/routines' : Routines
 };
 
-// Define protected routes list (what's behind the login)
+// Define protected routes list 
 const protectedRoutes = ['#/dashboard', '#/profile', '#/Home','#/progress'];
 
 function router() {
@@ -61,9 +88,7 @@ function router() {
   render();
 }
 
-// ==========================
-// 4. Render Engine - what is being showed on the document (html)
-// ==========================
+// render engine
 
 function render() {
   const app = document.getElementById('app');
@@ -86,10 +111,9 @@ function render() {
   attachEvents();
 }
 
-// ==========================
+
 // 5. Pages Components
-// ==========================
-// here if (state.user) checks if the user is logged in or not
+//  if (state.user) checks if the user is logged in or not
 
 function Intro() {
   return `
@@ -189,9 +213,8 @@ function Routines() {
   <p> Some information about the app</p>`;
 }
 
-// ==========================
-// 6. Event Binding
-// ==========================
+
+// Event Binding
 
 function attachEvents() {
 
@@ -228,9 +251,9 @@ if (onbNext) { onbNext.addEventListener('click', () => {
 }
 
 
-// =======7. Auth Logic======
+
 //   LOG IN LOGIC
-// ==========================
+
 
 function login() {
   const username = document.getElementById('username').value;
@@ -252,9 +275,9 @@ function login() {
   }, 800);
 }
 
-// =======7. Auth Logic======
+
 //   LOG OUT LOGIC
-// ==========================
+
 
 
 function logout() {
@@ -271,9 +294,9 @@ function logout() {
     window.location.hash = '#/login'; // redirect to Home
   }
 }
-// ==========================
-// 8. Bootstrapping - App Start
-// ==========================
+
+// Bootstrapping - App Start
+
 
 window.addEventListener('hashchange', router);
 window.addEventListener('load', router);
