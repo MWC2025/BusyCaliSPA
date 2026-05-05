@@ -26,33 +26,117 @@ button{
   padding-bottom: 90px;
 }
 
+/* navigation */
 
 
-nav {
-  display: flex;
-  justify-content: space-between; /* left / right */
-  align-items: center;           /* vertically center links */
-  padding: 1rem 2rem;
-  background: #fff;
-  border-bottom: 1px solid #ddd;
-}
-
-.nav-left a,
-.nav-right a {
+.nav-right {
   margin-right: 1rem;
   text-decoration: none;
-  color: #333;
 }
 
-.nav-left a:last-child,
-.nav-right a:last-child {
-  margin-right: 0; /* remove margin from last link in each group */
+.nav-top {
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
 }
+.nav-logo { font-weight: 800; font-size: 1.2rem; }
 
-nav a:hover {
-  text-decoration: underline;
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 390px;
+  display: flex;
+  justify-content: space-around;
+  background: #fff;
+  border-top: 1px solid #ddd;
+  padding: 8px 0;
+  z-index: 100;
 }
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #999;
+  font-size: 6 rem;
+  gap: 2px;
+}
+.nav-item.active { color: #0593f2; font-weight: 700; }
+
+
 
 /* error */
 
 .error-text { color: red; font-size: 0.85rem; margin-top: 8px; }
+
+/* onboarding */
+.onb-bar-wrap { width: 100%;
+  background: #eee;
+  border-radius: 8px; 
+  height: 6px; 
+  margin: 12px 0 24px;
+}
+
+.onb-bar { 
+  height: 6px; 
+  background: #0593f2; 
+  border-radius: 8px; 
+  transition: width 0.3s;
+}
+.level-options { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px; 
+  margin: 16px 0;
+}
+.level-btn { 
+  padding: 14px; 
+  border: 2px solid #ddd; 
+  border-radius: 10px; 
+  background: #fff; 
+  font-size: 1rem; 
+  text-align: left; 
+  cursor: pointer; 
+}
+.level-btn.selected { 
+  border-color: #0593f2; 
+  background: #e8f4ff; 
+  font-weight: 700; 
+}
+
+/* Home page */
+.stat-card {
+  background: #f4f0ff;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  margin: 16px 0;
+}
+.stat-num {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #6C4FE8;
+  margin: 0;
+}
+.stat-label {
+  font-size: 0.8rem;
+  color: #888;
+  margin: 4px 0 0;
+}
+.routine-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.routine-name { font-weight: 700; margin: 0; }
+.routine-meta { font-size: 0.8rem; color: #888; margin: 4px 0 0; }
+.section-title { font-size: 1rem; font-weight: 700; margin: 20px 0 10px; }
+.empty-text { font-size: 0.85rem; color: #999; text-align: center; } 
