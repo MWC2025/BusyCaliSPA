@@ -180,18 +180,7 @@ function render() {
 // 5. Pages Components
 //  if (state.user) checks if the user is logged in or not
 
-function WorkoutView() {
-  return `
-    <img src="resources/images/logo.png" alt="logo image">
-    <p>Calisthenics, for Busy People.</p>
-    
 
-    <button id="loginPg">Login</button>
-    <button id="CreateAccBtn">Create Account</button>
-
-
-  `;
-}
 
 function Intro() {
   return `
@@ -206,6 +195,42 @@ function Intro() {
   `;
 }
 
+function WorkoutView() {
+  const routineID = parseInt(localStorage.getItem('activeWorkout'));
+  const routine = ROUTINES.find(r => r.id === routineID);
+
+  if (!routine) {
+    return `
+      <div class="workout-page">
+        <h2>No workout selected</h2>
+        <a href="#/routines">← Back to Routines</a>
+      </div>
+    `;
+  }
+
+  const exercise = routine.exercises[state.currentExerciseInd];
+  const isLast = state.currentExerciseInd === routine.exercises.length - 1;
+  const exerciseNum = state.currentExerciseInd + 1;
+  const total = routine.exercises.length;
+
+  return `
+    <div class="workout-page">
+      <div class="workout-header">
+        <p class="workout-routine-name">${routine.name}</p>
+        <p class="workout-counter">${exerciseNum} / ${total}</p>
+      </div>
+      <div class="exercise-card">
+        <h2 class="exercise-name">${exercise.name}</h2>
+        <p class="exercise-sets">${exercise.sets} sets × ${exercise.reps} reps</p>
+      </div>
+      ${isLast
+        ? `<button id="finishWorkout" class="btn btn-primary btn-full">Finish Workout ✓</button>`
+        : `<button id="nextExercise" class="btn btn-primary btn-full">Next Exercise →</button>`
+      }
+      <a href="#/routines" style="display:block; text-align:center; margin-top:16px;">Quit Workout</a>
+    </div>
+  `;
+}
 
 function LogIn() {
   if (state.user) {
@@ -295,7 +320,11 @@ function Home() {
 function About() {
   return `
   <h1>About Page</h1>
-  <p> Some information about the app</p>`;
+  <div class="about-card">dig</div>
+
+  <div class="about-card">gds</div>
+  
+  `;
 }
 function Profile() {
     if (state.user) {
@@ -509,7 +538,7 @@ if (signupBtn) signupBtn.addEventListener('click', signup);
 document.querySelectorAll('.start-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const id = btn.dataset.id;
-    localStorage.setItem('bc_activeWorkout', id);
+    localStorage.setItem('activeWorkout', id);
     window.location.hash = '#/workout';
   });
 });
@@ -567,6 +596,27 @@ if (onbFinish) onbFinish.addEventListener('click', () => {
   window.location.hash = '#/dashboard';
 });
 
+  const nextExercise = document.getElementById('nextExercise');
+  if (nextExercise) nextExercise.addEventListener('click', () => {
+    state.currentExerciseInd++;
+    render();
+  });
+
+  const finishWorkout = document.getElementById('finishWorkout');
+  if (finishWorkout) finishWorkout.addEventListener('click', () => {
+    const routineID = parseInt(localStorage.getItem('activeWorkout'));
+    const routine = ROUTINES.find(r => r.id === routineID);
+    const newEntry = {
+      date: new Date().toISOString(),
+      routineName: routine.name,
+      exercises: routine.exercises
+    };
+    const workouts = getWorkouts(state.user);
+    workouts.push(newEntry);
+    saveWorkouts(state.user, workouts);
+    state.currentExerciseInd = 0;
+    window.location.hash = '#/progress';
+  });
 
 }
 
