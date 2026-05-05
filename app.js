@@ -5,7 +5,8 @@ const state = {
   isLoading: false,
   onboardingStep: 1,
   onboardingData: {},
-  routineFilter: 'All'
+  routineFilter: 'All',
+  currentExerciseInd: 0
 };
 
 // Local Storage
@@ -131,11 +132,12 @@ const routes = {
   '#/onboarding': Onboarding,
   '#/progress': Progress,
   '#/signup' : SignUp,
-  '#/routines' : Routines
+  '#/routines' : Routines,
+  '#/workout': WorkoutView,
 };
 
 // Define protected routes list 
-const protectedRoutes = ['#/dashboard', '#/profile', '#/Home','#/progress'];
+const protectedRoutes = ['#/dashboard', '#/profile', '#/Home','#/progress', '#/workout'];
 
 function router() {
   const hash = window.location.hash || '#/';
@@ -177,6 +179,19 @@ function render() {
 
 // 5. Pages Components
 //  if (state.user) checks if the user is logged in or not
+
+function WorkoutView() {
+  return `
+    <img src="resources/images/logo.png" alt="logo image">
+    <p>Calisthenics, for Busy People.</p>
+    
+
+    <button id="loginPg">Login</button>
+    <button id="CreateAccBtn">Create Account</button>
+
+
+  `;
+}
 
 function Intro() {
   return `
@@ -226,27 +241,27 @@ function SignUp() {
 }
 
 function Home() {
-  // 1. Get data
+  
   const profile = getProfile(state.user);
   const allWorkouts = getWorkouts(state.user);
 
-  // 2. Work out greeting
+  // Work out greeting
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
-  // 3. Filter to this week's workouts
+  // Filterthis week's workouts
   const now = new Date();
   const startOfWeek = new Date(now);
   startOfWeek.setDate(now.getDate() - now.getDay() + 1);
   startOfWeek.setHours(0, 0, 0, 0);
   const thisWeek = allWorkouts.filter(w => new Date(w.date) >= startOfWeek);
 
-  // 4. Get recommended routines
+  //  recommended routines
   const userLevel = profile.fitnessLevel || 'Beginner';
   let recommended = ROUTINES.filter(r => r.fitnessLevel === userLevel).slice(0, 2);
   if (recommended.length === 0) recommended = ROUTINES.slice(0, 2);
 
-  // 5. Build routine cards HTML
+  // cards HTML
   const cardsHTML = recommended.map(r => `
     <div class="routine-card">
       <div>
@@ -257,7 +272,6 @@ function Home() {
     </div>
   `).join('');
 
-  // 6. Return the full page HTML
   return `
     <div class="home-page">
       <h2>${greeting}, ${state.user}!</h2>
@@ -297,20 +311,63 @@ function Profile() {
     <p>Must be Logged in to view Profile</p>
   `;
 }
-
 function Progress() {
-    if (state.user) {
+  const workouts = getWorkouts(state.user);
+
+  // Empty state — no workouts logged yet
+  if (workouts.length === 0) {
     return `
-      <h1> Progress</h1>
-      <p> This is the Progress page when the user is logged in </p>
+      <div class="progress-page">
+        <h1>Progress</h1>
+        <p>No workouts logged yet!</p>
+        <a href="#/routines">Start your first workout →</a>
+      </div>
     `;
   }
 
+  // Calculate this month's workouts
+  const now = new Date();
+  const thisMonth = workouts.filter(w => {
+    const d = new Date(w.date);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+
+  // Build past session cards
+  const sessionCards = workouts.map(w => `
+    <div class="session-card">
+      <p class="session-name">${w.routineName}</p>
+      <p class="session-date">${new Date(w.date).toLocaleDateString('en-GB')}</p>
+    </div>
+  `).join('');
+
+  // Single return with everything
   return `
-    <h1>Locked</h1>
-    <p>Must be Logged in to view Progress</p>
+    <div class="progress-page">
+      <h1>Progress</h1>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <p class="stat-label">This Month</p>
+          <p class="stat-num">${thisMonth.length}</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Total Workouts</p>
+          <p class="stat-num">${workouts.length}</p>
+        </div>
+      </div>
+
+      <h3>Past Sessions</h3>
+      <div class="session-list">
+        ${sessionCards}
+      </div>
+    </div>
   `;
 }
+     
+
+ 
+  
+
 
 function Onboarding() {
   const step = state.onboardingStep;
@@ -380,17 +437,28 @@ function Onboarding() {
 }
 
 function Routines() {
+  const levels = ['All', 'Beginner', 'Intermediate', 'Advanced'];
   const visible = state.routineFilter === 'All'
     ? ROUTINES
-    : ROUTINES.filter(r => r.level === state.routineFilter);
-
+    : ROUTINES.filter(r => r.fitnessLevel === state.routineFilter); 
   return `
-    <button class="filter-btn ${state.routineFilter === 'All' ? 'active' : ''}"
-      id="filterAll">All</button>
-    <button class="filter-btn" id="filterBeginner">Beginner</button>
-    ${visible.map(r => `<div class="routine-card">
-      <p>${r.name}</p><p>${r.fitnessLevel}</p>
-    </div>`).join('')}`;
+    <h2>Routines</h2>
+    <div class="filter-btns">
+      ${levels.map(l => `
+        <button class="filter-btn ${state.routineFilter === l ? 'active' : ''}"
+          data-level="${l}" id="filter${l}">${l}</button>
+      `).join('')}
+    </div>
+    ${visible.map(r => `
+      <div class="routine-card">
+        <div>
+          <p class="routine-name">${r.name}</p>
+          <p class="routine-meta">${r.duration} · ${r.fitnessLevel}</p>
+        </div>
+        <button class="start-btn btn" data-id="${r.id}">Start</button>
+      </div>
+    `).join('')}
+  `;
 }
 
 
@@ -436,7 +504,15 @@ if (logoutBtn) logoutBtn.addEventListener('click', logout);
 
 
 const signupBtn = document.getElementById('signupBtn'); 
-if (signupBtn) signupBtn.addEventListener('click', signup); 
+if (signupBtn) signupBtn.addEventListener('click', signup);
+
+document.querySelectorAll('.start-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.id;
+    localStorage.setItem('bc_activeWorkout', id);
+    window.location.hash = '#/workout';
+  });
+});
 
 document.querySelectorAll('.level-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -444,6 +520,14 @@ document.querySelectorAll('.level-btn').forEach(btn => {
       btn.classList.add('selected');
   });
 });
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.routineFilter = btn.dataset.level; // reads the data-level attribute
+    render();
+  });
+});
+
 // onboarding events 
 const onbNext1 = document.getElementById('onbNext1');
 if (onbNext1) onbNext1.addEventListener('click', () => {
@@ -483,11 +567,6 @@ if (onbFinish) onbFinish.addEventListener('click', () => {
   window.location.hash = '#/dashboard';
 });
 
-const filterAll = document.getElementById('filterAll');
-if (filterAll) filterAll.addEventListener('click', () => {
-  state.routineFilter = 'All';
-  render();
-});
 
 }
 
@@ -504,7 +583,7 @@ function login() {
 
 //validation check
   if (!username || !password) {
-    alert('Please fill in all fields');
+    document.getElementById('loginError').textContent = 'Please fill in all fields';
     return;
   }
 
