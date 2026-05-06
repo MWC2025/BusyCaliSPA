@@ -85,7 +85,7 @@ button { font-family: 'Montserrat', sans-serif; }
   align-items: center;
   text-decoration: none;
   color: var(--muted);
-  font-size: 0.65rem;
+  font-size: 1rem;
   font-weight: 600;
   gap: 3px;
 }
@@ -327,7 +327,7 @@ button { font-family: 'Montserrat', sans-serif; }
   display: flex;
   gap: 8px;
   margin-bottom: 18px;
-  overflow-x: auto;
+  overflow-x: auo;
   padding-bottom: 4px;
 }
 
@@ -345,7 +345,7 @@ button { font-family: 'Montserrat', sans-serif; }
 
 .filter-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-/* ── Workout Preview ── */
+/* ── Workout  ── */
 .preview-header {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dk) 100%);
   border-radius: 16px;
@@ -370,6 +370,126 @@ button { font-family: 'Montserrat', sans-serif; }
 
 .ex-name   { font-weight: 700; font-size: 0.88rem; margin: 0 0 2px; }
 .ex-detail { font-size: 0.75rem; color: var(--muted); margin: 0; }
+
+
+/* Preview screen */
+.exercise-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0 20px;
+}
+
+.exercise-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.ex-num {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ex-name {
+  flex: 1;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+}
+
+.ex-detail {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Active workout screen */
+.workout-progress-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+
+.exercise-card {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dk) 100%);
+  border-radius: 16px;
+  padding: 30px 20px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.exercise-name {
+  color: #fff;
+  font-size: 1.6rem;
+  margin: 0 0 6px;
+}
+
+.exercise-detail {
+  color: rgba(255,255,255,0.85);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.set-tracker {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.set-label {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 0 12px;
+}
+
+.reps-input {
+  width: 80px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 10px;
+  color: var(--primary-dk);
+  outline: none;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.workout-nav-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.link-text {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-decoration: none;
+  padding: 8px;
+  display: block;
+}
+
+.link-text:hover {
+  color: var(--primary-dk);
+}
 
 /* ── Active Workout ── */
 .workout-counter { font-size: 0.82rem; color: var(--muted); margin: 0 0 18px; font-weight: 600; text-align: center; }

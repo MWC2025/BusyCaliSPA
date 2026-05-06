@@ -99,7 +99,8 @@ function Nav() {
   if (!state.user) {
     return `
        <nav class="nav-top">
-        <img src="resources/images/banner.png" alt="BusyCali" class="nav-banner">
+       
+        <a href="#/"><img src="resources/images/banner.png" alt="BusyCali" class="nav-banner"></a>
       </nav>
     `;
   }
@@ -108,7 +109,7 @@ function Nav() {
 
   return `
    <nav class="nav-top">
-      <img src="resources/images/banner.png" alt="BusyCali" class="nav-banner">
+      <a href="#/"><img src="resources/images/banner.png" alt="BusyCali" class="nav-banner"></a>
     </nav>
     <nav class="bottom-nav">
       <a href="#/dashboard" class="nav-item ${h === '#/dashboard' ? 'active' : ''}">
@@ -148,9 +149,13 @@ const protectedRoutes = ['#/dashboard', '#/profile', '#/routines','#/progress', 
 function router() {
   const hash = window.location.hash || '#/';
 
-  // Route guard:
-  // If the current route is one of the protected routes AND there is no logged-in user, 
-  // redirect the user to the login page.
+  // If already logged in and on intro/login/signup, send to dashboard
+  if (state.user && ['#/', '#/login', '#/signup'].includes(hash)) {
+    window.location.hash = '#/dashboard';
+    return;
+  }
+
+  // If not logged in and trying to access a protected page, send to login
   if (protectedRoutes.includes(hash) && !state.user) {
     window.location.hash = '#/login';
     return;
@@ -165,32 +170,35 @@ function render() {
   const app = document.getElementById('app');
   const nav = document.getElementById('nav');
 
-  nav.innerHTML = Nav();  //  display nav every time
+  // Hide bottom nav on auth/onboarding pages
+  const noNavRoutes = ['#/', '#/login', '#/signup', '#/onboarding'];
+  const currentHash = window.location.hash || '#/';
+  const isOnboarding = currentHash.startsWith('#/onboarding');
+  if (noNavRoutes.includes(currentHash) || isOnboarding) {
+    nav.style.display = 'none';
+  } else {
+    nav.style.display = '';
+    nav.innerHTML = Nav();
+  }
 
   if (state.isLoading) {
-    app.innerHTML = `<p>Loading...</p>`;
+    app.innerHTML = `<div class="loading">Loading...</div>`;
     return;
   }
 
-// Get the function from the routes object that matches the current URL hash
-// (defaulting to '#/' if no hash exists).
-// If a matching route function is found, render it.
-// Otherwise, display the 404 message.
-  const page = routes[window.location.hash || '#/'];
-  app.innerHTML = page ? page() : `<h1>404 <br><br> Page does not exist</h1>`;
-
+  const page = routes[currentHash];
+  app.innerHTML = page ? page() : `<div>404 Page does not exist</div>`;
   attachEvents();
 }
 
 
-// 5. Pages Components
-//  if (state.user) checks if the user is logged in or not
 
 
 
 function Intro() {
   return `
     <div class="intro-page">
+      <img src="resources/images/banner.png" alt="BusyCali" class="nav-banner">
       <img src="resources/images/logo2.png" alt="BusyCali" class="intro-logo">
       <p class="intro-tagline">Calisthenics, for Busy People.</p>
       <div class="intro-btns">
@@ -229,7 +237,7 @@ function WorkoutView() {
       <div class="exercise-preview-list">
         ${exerciseList}
       </div>
-      <button id="startWorkoutBtn" class="btn">START TRAINING</button>
+      <button id="startWorkoutBtn" class="big-btn">START TRAINING</button>
     `;
   }
 
@@ -266,8 +274,8 @@ function WorkoutView() {
 
     <div class="workout-nav-btns">
       ${isLastSet && isLastExercise
-        ? `<button id="finishWorkout" class="btn">Finish Workout ✓</button>`
-        : `<button id="nextSet" class="btn">Complete Set →</button>`
+        ? `<button id="finishWorkout" class="big-btn">Finish Workout </button>`
+        : `<button id="nextSet" class="big-btn">Complete Set →</button>`
       }
       <a href="#/routines" class="link-text">Quit Workout</a>
     </div>
@@ -415,23 +423,29 @@ const quote = quotes[new Date().getDay() % quotes.length];
        <h2 class="home-greeting">${greeting}, ${state.user}!</h2>
     <p class="home-sub">Ready for a workout?</p>
     <div class="streak-banner">  ${streakMsg}</div>
+    <button id="CTA" class= big-btn>Start A Workout</button>
+    <br> <br>
     <div class="stats-row">
       <div class="stat-card">
         <p class="stat-num">${thisWeek.length}</p>
         <p class="stat-label">Workouts this Week</p>
       </div>
+      
       <div class="stat-card">
         <p class="stat-num">${allWorkouts.length}</p>
         <p class="stat-label">Total Workout Sessions</p>
       </div>
     </div>
+    
     <p class="section-title">Recommended For You</p>
     ${cardsHTML}
-    <p style="text-align:center;margin-top:16px;font-size:0.82rem;">
+     <div class="streak-banner"> 
+    <p style="text-align:center;margin-top:16px;font-size:1.5rem;">
       <a href="#/about" class="about-link">About BusyCali</a>
     </p>
+    </div>
     ${lastWorkoutHTML}
-    ${quote}
+     <div class="streak-banner"> ${quote}</div>
     
     
       `;
@@ -522,9 +536,10 @@ function Progress() {
   if (workouts.length === 0) {
     return `
       <div class="progress-page">
-        <h1>Progress</h1>
+        <h2>Progress</h1>
         <p>No workouts logged yet!</p>
-        <a href="#/routines" class="btn">Start your first workout →</a>
+        <h3>Start your first workout </h3>
+        <button id="CTA" class= big-btn>Go to Routines</button>
       </div>
     `;
   }
@@ -663,6 +678,7 @@ function Routines() {
           data-level="${l}">${l}</button>
       `).join('')}
     </div>
+    <br> 
     ${visible.map(r => `
       <div class="routine-card">
         <div>
@@ -682,7 +698,12 @@ function attachEvents() {
 
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) loginBtn.addEventListener('click', login);
-   
+
+const CTA = document.getElementById('CTA');
+if (CTA) { CTA.addEventListener('click', () => {
+    window.location.hash = '#/routines';
+  });
+}
 const loginPg = document.getElementById('loginPg');
 if (loginPg) { loginPg.addEventListener('click', () => {
     window.location.hash = '#/login';
@@ -722,6 +743,7 @@ if (signupBtn) signupBtn.addEventListener('click', signup);
 
 
 
+
 document.querySelectorAll('.level-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('selected'));
@@ -731,7 +753,7 @@ document.querySelectorAll('.level-btn').forEach(btn => {
 
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    state.routineFilter = btn.dataset.level; // reads the data-level attribute
+    state.routineFilter = btn.dataset.level; 
     render();
   });
 });
