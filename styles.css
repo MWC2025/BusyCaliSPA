@@ -1,21 +1,21 @@
-/* Google Fonts font import*/
+/* ── Google Fonts ── */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;0,700;0,800;1,800&display=swap');
 
-/* colour pallete */
+/* ── Colour Palette ── */
 :root {
-  --primary:    #68C3D4;
+  --primary:    #68c4d4;
   --primary-dk: #578EA3;
   --muted:      #6891A4;
   --border:     #e5e5e5;
   --bg-card:    #f4fbfc;
 }
 
-/* App Body */
+/* ── Base ── */
 body {
   font-family: 'Montserrat', sans-serif;
   margin: 0 auto;
   padding: 0;
-  background: #fff;
+  background: #6fdbe9;
   color: #1a1a1a;
   max-width: 390px;
   min-height: 100vh;
@@ -28,16 +28,23 @@ button { font-family: 'Montserrat', sans-serif; }
   padding-bottom: 100px;
 }
 
-/* navigation */
+
+
+/* ── Navigation ── */
 .nav-top {
-  padding: 14px 20px;
-  background: var(--primary-dk);
+  padding: 10px 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   position: sticky;
   top: 0;
   z-index: 200;
+}
+
+.nav-banner {
+  height: 75px;
+  width: auto;
+  object-fit: contain;
 }
 
 .nav-logo {
@@ -55,7 +62,6 @@ button { font-family: 'Montserrat', sans-serif; }
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'Montserrat', sans-serif;
 }
 
 .bottom-nav {
@@ -84,14 +90,9 @@ button { font-family: 'Montserrat', sans-serif; }
   gap: 3px;
 }
 
-.nav-item .icon { font-size: 1.3rem; }
+.nav-item.active { color: var(--primary-dk); font-weight: 700; }
 
-.nav-item.active {
-  color: var(--primary-dk);
-  font-weight: 700;
-}
-
-/* error */
+/* ── Shared ── */
 .error-text {
   color: #d9534f;
   font-size: 0.8rem;
@@ -99,7 +100,28 @@ button { font-family: 'Montserrat', sans-serif; }
   font-weight: 600;
 }
 
-/* intro */
+.big-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.big-btn:hover { background: var(--primary-dk); }
+
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 18px 0 12px;
+}
+
+/* ── Intro ── */
 .intro-page {
   min-height: 100vh;
   background: linear-gradient(160deg, var(--primary-dk) 0%, var(--primary) 100%);
@@ -111,14 +133,15 @@ button { font-family: 'Montserrat', sans-serif; }
   box-sizing: border-box;
 }
 
-.intro-logo {
-  font-size: 3.5rem;
-  font-weight: 800;
-  font-style: italic;
-  color: #fff;
-  text-align: center;
-  letter-spacing: 2px;
+.intro-logo {  
+  height: 150px;
+  width: auto;
+  object-fit: contain;
+  align-items: center;
+  display: flex;
+
 }
+
 
 .intro-tagline {
   color: rgba(255,255,255,0.85);
@@ -127,12 +150,7 @@ button { font-family: 'Montserrat', sans-serif; }
   font-weight: 600;
 }
 
-.intro-btns {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 100%;
-}
+.intro-btns { display: flex; flex-direction: column; gap: 14px; width: 100%; }
 
 .intro-btns button {
   padding: 16px;
@@ -147,9 +165,7 @@ button { font-family: 'Montserrat', sans-serif; }
 .intro-btns button:first-child { background: #fff; color: var(--primary-dk); }
 .intro-btns button:last-child  { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.7); }
 
-/* auth */
-.auth-page { padding: 24px 16px; }
-
+/* ── Auth ── */
 .auth-back {
   background: none;
   border: none;
@@ -162,12 +178,7 @@ button { font-family: 'Montserrat', sans-serif; }
   display: block;
 }
 
-.auth-title {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--primary-dk);
-  margin: 0 0 24px;
-}
+.auth-title { font-size: 2rem; font-weight: 800; color: var(--primary-dk); margin: 0 0 24px; }
 
 .auth-input {
   width: 100%;
@@ -192,23 +203,16 @@ button { font-family: 'Montserrat', sans-serif; }
   border-radius: 14px;
   font-size: 1rem;
   font-weight: 700;
-  font-family: 'Montserrat', sans-serif;
   cursor: pointer;
   margin-top: 8px;
 }
 
 .auth-btn:hover { background: var(--primary-dk); }
 
-.auth-link {
-  text-align: center;
-  margin-top: 16px;
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
+.auth-link { text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(--muted); }
 .auth-link a { color: var(--primary-dk); font-weight: 700; text-decoration: none; }
 
-/* onboarding */
+/* ── Onboarding ── */
 .onb-bar-wrap {
   width: 100%;
   background: #e0f5f7;
@@ -217,32 +221,11 @@ button { font-family: 'Montserrat', sans-serif; }
   margin: 12px 0 24px;
 }
 
-.onb-bar {
-  height: 6px;
-  background: var(--primary);
-  border-radius: 8px;
-  transition: width 0.3s;
-}
+.onb-bar { height: 6px; background: var(--primary); border-radius: 8px; transition: width 0.3s; }
+.onb-title { font-size: 1.5rem; font-weight: 800; color: var(--primary-dk); margin: 0 0 6px; }
+.onb-subtitle { font-size: 0.9rem; color: var(--muted); margin: 0 0 20px; }
 
-.onb-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--primary-dk);
-  margin: 0 0 6px;
-}
-
-.onb-subtitle {
-  font-size: 0.9rem;
-  color: var(--muted);
-  margin: 0 0 20px;
-}
-
-.level-options {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 0 0 24px;
-}
+.level-options { display: flex; flex-direction: column; gap: 12px; margin: 0 0 24px; }
 
 .level-btn {
   padding: 14px 16px;
@@ -250,19 +233,13 @@ button { font-family: 'Montserrat', sans-serif; }
   border-radius: 12px;
   background: #fff;
   font-size: 0.9rem;
-  font-family: 'Montserrat', sans-serif;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
   color: #1a1a1a;
 }
 
-.level-btn.selected {
-  border-color: var(--primary);
-  background: #e6f8fa;
-  color: var(--primary-dk);
-  font-weight: 700;
-}
+.level-btn.selected { border-color: var(--primary); background: #e6f8fa; color: var(--primary-dk); font-weight: 700; }
 
 .onb-next-btn {
   width: 100%;
@@ -273,23 +250,12 @@ button { font-family: 'Montserrat', sans-serif; }
   border-radius: 14px;
   font-size: 1rem;
   font-weight: 700;
-  font-family: 'Montserrat', sans-serif;
   cursor: pointer;
 }
 
-/* home */
-.home-greeting {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--primary-dk);
-  margin: 0 0 2px;
-}
-
-.home-sub {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin: 0 0 14px;
-}
+/* ── Home ── */
+.home-greeting { font-size: 1.4rem; font-weight: 800; color: var(--primary-dk); margin: 0 0 2px; }
+.home-sub { font-size: 0.85rem; color: var(--muted); margin: 0 0 14px; }
 
 .streak-banner {
   background: #e6f8fa;
@@ -302,11 +268,7 @@ button { font-family: 'Montserrat', sans-serif; }
   color: var(--primary-dk);
 }
 
-.stats-row {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-}
+.stats-row { display: flex; gap: 12px; margin-bottom: 20px; }
 
 .stat-card {
   flex: 1;
@@ -316,27 +278,10 @@ button { font-family: 'Montserrat', sans-serif; }
   text-align: center;
 }
 
-.stat-num {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #fff;
-  margin: 0;
-  line-height: 1;
-}
+.stat-num { font-size: 2rem; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
+.stat-label { font-size: 0.7rem; color: rgba(255,255,255,0.85); margin: 5px 0 0; font-weight: 600; }
 
-.stat-label {
-  font-size: 0.7rem;
-  color: rgba(255,255,255,0.85);
-  margin: 5px 0 0;
-  font-weight: 600;
-}
-
-.section-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin: 18px 0 12px;
-}
-
+/* ── Routines ── */
 .routine-card {
   display: flex;
   justify-content: space-between;
@@ -359,7 +304,6 @@ button { font-family: 'Montserrat', sans-serif; }
   border-radius: 10px;
   font-size: 0.8rem;
   font-weight: 700;
-  font-family: 'Montserrat', sans-serif;
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -372,19 +316,10 @@ button { font-family: 'Montserrat', sans-serif; }
   border-radius: 10px;
   font-size: 0.8rem;
   font-weight: 700;
-  font-family: 'Montserrat', sans-serif;
   cursor: pointer;
   flex-shrink: 0;
 }
 
-.empty-text {
-  font-size: 0.85rem;
-  color: #999;
-  text-align: center;
-  padding: 20px 0;
-}
-
-/* routines filter */
 .filter-row {
   display: flex;
   gap: 8px;
@@ -400,19 +335,14 @@ button { font-family: 'Montserrat', sans-serif; }
   background: #fff;
   font-size: 0.78rem;
   font-weight: 700;
-  font-family: 'Montserrat', sans-serif;
   cursor: pointer;
   white-space: nowrap;
   color: var(--muted);
 }
 
-.filter-btn.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
-}
+.filter-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-/* view routine preview */
+/* ── Workout Preview ── */
 .preview-header {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dk) 100%);
   border-radius: 16px;
@@ -438,23 +368,9 @@ button { font-family: 'Montserrat', sans-serif; }
 .ex-name   { font-weight: 700; font-size: 0.88rem; margin: 0 0 2px; }
 .ex-detail { font-size: 0.75rem; color: var(--muted); margin: 0; }
 
-.big-btn {
-  width: 100%;
-  padding: 16px;
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 14px;
-  font-size: 1rem;
-  font-weight: 700;
-  font-family: 'Montserrat', sans-serif;
-  cursor: pointer;
-  margin-top: 10px;
-}
+/* ── Active Workout ── */
+.workout-counter { font-size: 0.82rem; color: var(--muted); margin: 0 0 18px; font-weight: 600; text-align: center; }
 
-.big-btn:hover { background: var(--primary-dk); }
-
-/* active workout */
 .exercise-card {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dk) 100%);
   border-radius: 20px;
@@ -466,7 +382,35 @@ button { font-family: 'Montserrat', sans-serif; }
 
 .exercise-name   { font-size: 1.8rem; font-weight: 800; margin: 0 0 10px; }
 .exercise-detail { font-size: 1rem; opacity: 0.9; margin: 0; font-weight: 600; }
-.workout-counter { font-size: 0.82rem; color: var(--muted); margin: 0 0 18px; font-weight: 600; }
+
+/* Set tracker — reps input */
+.set-tracker {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+  border: 1.5px solid var(--border);
+}
+
+.set-label { font-size: 0.85rem; color: var(--muted); font-weight: 600; margin: 0 0 12px; }
+
+.reps-input {
+  width: 80px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 10px;
+  color: var(--primary-dk);
+  outline: none;
+  font-family: 'Montserrat', sans-serif;
+  
+}
+
+.reps-input::-webkit-outer-spin-button,
+.reps-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
 .workout-next-btn {
   width: 100%;
@@ -477,7 +421,6 @@ button { font-family: 'Montserrat', sans-serif; }
   border-radius: 14px;
   font-size: 1rem;
   font-weight: 700;
-  font-family: 'Montserrat', sans-serif;
   cursor: pointer;
   margin-bottom: 12px;
 }
@@ -491,38 +434,61 @@ button { font-family: 'Montserrat', sans-serif; }
   font-weight: 600;
 }
 
-/* end workout */
-.end-page { text-align: center; padding: 48px 24px; }
+/* ── End Workout ── */
+.end-page { text-align: center; padding: 48px 24px 24px; }
 .end-icon  { font-size: 4rem; margin-bottom: 12px; }
-.end-title { font-size: 2rem; font-weight: 800; color: var(--primary-dk); margin: 0 0 8px; }
-.end-sub   { font-size: 0.9rem; color: var(--muted); margin: 0 0 28px; }
+.end-title { font-size: 2rem; font-weight: 800; color: var(--primary-dk); margin: 0 0 6px; }
+.end-sub   { font-size: 0.9rem; color: var(--muted); margin: 0 0 24px; }
 
-/* progress */
-.progress-ring-wrap {
-  display: flex;
-  justify-content: center;
-  margin: 16px 0 6px;
+/* Per-exercise summary block */
+.end-exercise-summary {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border-left: 4px solid var(--primary);
+  text-align: left;
 }
 
-.progress-ring {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.end-ex-name {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--primary-dk);
+  margin: 0 0 8px;
 }
 
-.progress-ring-inner {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
+/* Set rows inside summary */
+.set-summary-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.set-summary-row {
   background: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary-dk);
 }
+
+.end-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+
+.end-actions a {
+  display: block;
+  text-align: center;
+  padding: 14px;
+  border-radius: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.end-actions .btn         { background: var(--primary); color: #fff; }
+.end-actions .btn-secondary { background: transparent; color: var(--primary-dk); border: 2px solid var(--primary); }
+
+/* ── Progress ── */
+.progress-ring-wrap { display: flex; justify-content: center; margin: 16px 0 6px; }
+
+.progress-ring { width: 140px; height: 140px; }
 
 .ring-num   { font-size: 1.6rem; font-weight: 800; color: var(--primary-dk); line-height: 1; }
 .ring-label { font-size: 0.58rem; color: var(--muted); font-weight: 600; text-align: center; }
@@ -535,31 +501,8 @@ button { font-family: 'Montserrat', sans-serif; }
   margin-bottom: 20px;
 }
 
-.personal-bests {
-  background: var(--bg-card);
-  border-radius: 14px;
-  padding: 14px 16px;
-  margin-bottom: 20px;
-}
-
-.pb-title { font-weight: 800; font-size: 0.9rem; color: var(--primary-dk); margin: 0 0 10px; }
-
-.pb-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.85rem;
-}
-
-.pb-row:last-child { border-bottom: none; }
-.pb-val { font-weight: 800; color: var(--primary-dk); }
-
+/* Session cards */
 .session-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   border: 1.5px solid var(--border);
   border-radius: 12px;
   padding: 12px 14px;
@@ -567,10 +510,32 @@ button { font-family: 'Montserrat', sans-serif; }
   background: var(--bg-card);
 }
 
-.session-name { font-weight: 700; font-size: 0.88rem; margin: 0; }
-.session-date { font-size: 0.75rem; color: var(--muted); margin: 3px 0 0; }
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
 
-/* profile */
+.session-name { font-weight: 700; font-size: 0.88rem; margin: 0; color: var(--primary-dk); }
+.session-date { font-size: 0.75rem; color: var(--muted); margin: 0; }
+
+/* Set rows inside session card */
+.session-sets { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.session-set-row {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* ── Profile ── */
 .profile-page { padding: 28px 16px; text-align: center; }
 
 .profile-avatar {
@@ -587,29 +552,16 @@ button { font-family: 'Montserrat', sans-serif; }
   margin: 0 auto 14px;
 }
 
-.profile-name { font-size: 1.5rem; font-weight: 800; color: var(--primary-dk); margin: 0 0 4px; }
+.profile-name  { font-size: 1.5rem; font-weight: 800; color: var(--primary-dk); margin: 0 0 4px; }
 .profile-email { font-size: 0.82rem; color: var(--muted); margin: 0 0 20px; }
 
-.profile-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 24px;
-  text-align: left;
-}
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; text-align: left; }
 
-.profile-cell {
-  background: var(--bg-card);
-  border-radius: 12px;
-  padding: 12px 14px;
-}
-
+.profile-cell { background: var(--bg-card); border-radius: 12px; padding: 12px 14px; }
 .profile-cell-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; margin: 0 0 3px; }
 .profile-cell-val   { font-size: 0.95rem; font-weight: 800; color: var(--primary-dk); margin: 0; }
 
-/* about */
-.about-page { padding: 24px 16px; }
-
+/* ── About ── */
 .about-logo {
   font-size: 2.4rem;
   font-weight: 800;
@@ -620,13 +572,7 @@ button { font-family: 'Montserrat', sans-serif; }
   margin-bottom: 4px;
 }
 
-.about-tagline {
-  text-align: center;
-  font-weight: 700;
-  color: var(--primary-dk);
-  margin-bottom: 28px;
-}
-
+.about-tagline { text-align: center; font-weight: 700; color: var(--primary-dk); margin-bottom: 28px; }
 .about-section { margin-bottom: 28px; }
 
 .about-img {
@@ -643,3 +589,8 @@ button { font-family: 'Montserrat', sans-serif; }
 
 .about-section h3 { font-size: 1rem; font-weight: 800; color: var(--primary-dk); margin: 0 0 6px; }
 .about-section p  { font-size: 0.88rem; line-height: 1.6; color: #555; margin: 0; }
+
+.about-link {
+color:#578EA3;
+font-weight:600;
+}

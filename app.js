@@ -6,7 +6,9 @@ const state = {
   onboardingStep: 1,
   onboardingData: {},
   routineFilter: 'All',
-  currentExerciseInd: 0
+  currentExerciseInd: 0,
+  currentSetInd: 0,    
+  completedSets: []
 };
 
 // Local Storage
@@ -96,8 +98,8 @@ const ROUTINES = [
 function Nav() {
   if (!state.user) {
     return `
-      <nav class="nav-top">
-        <span class="nav-logo">BusyCali</span>
+       <nav class="nav-top">
+        <img src="resources/images/banner.png" alt="BusyCali" class="nav-banner">
       </nav>
     `;
   }
@@ -105,6 +107,9 @@ function Nav() {
   const h = window.location.hash;
 
   return `
+   <nav class="nav-top">
+      <img src="resources/images/banner.png" alt="BusyCali" class="nav-banner">
+    </nav>
     <nav class="bottom-nav">
       <a href="#/dashboard" class="nav-item ${h === '#/dashboard' ? 'active' : ''}">
         <span class="nav-label">Home</span>
@@ -134,10 +139,11 @@ const routes = {
   '#/signup' : SignUp,
   '#/routines' : Routines,
   '#/workout': WorkoutView,
+  '#/end-workout': EndWorkout 
 };
 
 // Define protected routes list 
-const protectedRoutes = ['#/dashboard', '#/profile', '#/Home','#/progress', '#/workout'];
+const protectedRoutes = ['#/dashboard', '#/profile', '#/Home','#/progress', '#/workout', '#/end-workout'];
 
 function router() {
   const hash = window.location.hash || '#/';
@@ -184,97 +190,167 @@ function render() {
 
 function Intro() {
   return `
-    <img src="resources/images/logo.png" alt="logo image">
-    <p>Calisthenics, for Busy People.</p>
-    
-
-    <button id="loginPg">Login</button>
-    <button id="CreateAccBtn">Create Account</button>
-
-
+    <div class="intro-page">
+      <img src="resources/images/logo2.png" alt="BusyCali" class="intro-logo">
+      <p class="intro-tagline">Calisthenics, for Busy People.</p>
+      <div class="intro-btns">
+        <button id="loginPg">Login</button>
+        <button id="CreateAccBtn">Create Account</button>
+      </div>
+    </div>
   `;
+
 }
 
 function WorkoutView() {
   const routineID = parseInt(localStorage.getItem('activeWorkout'));
   const routine = ROUTINES.find(r => r.id === routineID);
+  const isPreview = localStorage.getItem('previewMode') === 'true';
 
   if (!routine) {
-    return `
-      <div style="text-align:center;padding:40px 16px">
-        <p>No workout selected.</p>
-        <a href="#/routines">← Back to Routines</a>
-      </div>`;
+    return `<p>No workout selected. <a href="#/routines">← Back to Routines</a></p>`;
   }
 
-  const exercise = routine.exercises[state.currentExerciseInd];
-  const isLast = state.currentExerciseInd === routine.exercises.length - 1;
-  const num = state.currentExerciseInd + 1;
-  const total = routine.exercises.length;
-
-  return `
-    <p class="workout-counter">${routine.name} · Exercise ${num} of ${total}</p>
-    <div class="exercise-card">
-      <p class="exercise-name">${exercise.name}</p>
-      <p class="exercise-detail">${exercise.sets} sets × ${exercise.reps} reps</p>
-    </div>
-    ${isLast
-      ? `<button class="workout-next-btn" id="finishWorkout">Finish Workout ✓</button>`
-      : `<button class="workout-next-btn" id="nextExercise">Next Exercise →</button>`}
-    <a href="#/routines" class="workout-quit">Quit Workout</a>`;
-}
-
-function EndWorkout() {
-  // shown after finishing a workout
-  const routineID = parseInt(localStorage.getItem('activeWorkout'));
-  const routine = ROUTINES.find(r => r.id === routineID) || { name: 'Workout', exercises: [] };
-  return `
-    <div class="end-page">
-      <div class="end-icon">🎉</div>
-      <h2 class="end-title">Well Done!</h2>
-      <p class="end-sub">You completed ${routine.name}</p>
-      <div class="stats-row" style="justify-content:center;">
-        <div class="stat-card" style="max-width:150px;">
-          <p class="stat-num">${routine.exercises.length}</p>
-          <p class="stat-label">Exercises Done</p>
-        </div>
+  // Preview screen
+  if (isPreview) {
+    const exerciseList = routine.exercises.map((e, i) => `
+      <div class="exercise-preview-row">
+        <span class="ex-num">${i + 1}</span>
+        <span class="ex-name">${e.name}</span>
+        <span class="ex-detail">${e.sets} sets × ${e.reps} reps</span>
       </div>
-      <button class="big-btn" onclick="window.location.hash='#/progress'">See Progress</button>
-      <br><br>
-      <a href="#/routines" style="color:#6891A4;font-size:0.85rem;font-weight:600;display:block;text-align:center;">Back to Routines</a>
-    </div>`;
-}
+    `).join('');
 
-function LogIn() {
-  if (state.user) {
     return `
-      <h1>Welcome back, <span style="color: #0593f2;">${state.user}</span></h1>
+      <button id="Back" class="back-btn">← Back</button>
+      <h2>${routine.name}</h2>
+      <p class="routine-meta">${routine.duration} · ${routine.fitnessLevel}</p>
+      <h3>Exercises</h3>
+      <div class="exercise-preview-list">
+        ${exerciseList}
+      </div>
+      <button id="startWorkoutBtn" class="btn">START TRAINING</button>
     `;
   }
 
+  // Active workout — set by set
+  const exercise = routine.exercises[state.currentExerciseInd];
+  const totalExercises = routine.exercises.length;
+  const exerciseNum = state.currentExerciseInd + 1;
+  const currentSet = state.currentSetInd + 1;
+  const totalSets = exercise.sets;
+  const isLastSet = state.currentSetInd === totalSets - 1;
+  const isLastExercise = state.currentExerciseInd === totalExercises - 1;
+
   return `
-    <button id="Back">Back</button>  
-    <h1>Login</h1>
-    
-    <input id="username" placeholder="Username"> <br> <br>
-    <input id="password" type="password" placeholder="Password"> <br><br>
-    <p id="loginError" style="color:red; font-size:0.85rem;"></p>
-    <button id="loginBtn">Login</button>
+    <p class="workout-progress-label">
+      Exercise ${exerciseNum} of ${totalExercises} · Set ${currentSet} of ${totalSets}
+    </p>
+
+    <div class="exercise-card">
+      <h2 class="exercise-name">${exercise.name}</h2>
+      <p class="exercise-detail">Target: ${exercise.sets} sets × ${exercise.reps} reps</p>
+    </div>
+
+    <div class="set-tracker">
+      <p class="set-label">Set ${currentSet} — How many reps did you complete?</p>
+      <input 
+        id="repsCompleted" 
+        type="number" 
+        placeholder="${exercise.reps}" 
+        min="0" 
+        max="99"
+        class="reps-input"
+      />
+    </div>
+
+    <div class="workout-nav-btns">
+      ${isLastSet && isLastExercise
+        ? `<button id="finishWorkout" class="btn">Finish Workout ✓</button>`
+        : `<button id="nextSet" class="btn">Complete Set →</button>`
+      }
+      <a href="#/routines" class="link-text">Quit Workout</a>
+    </div>
+  `;
+}
+
+function EndWorkout() {
+  const routineID = parseInt(localStorage.getItem('activeWorkout'));
+  const routine = ROUTINES.find(r => r.id === routineID) || { name: 'Workout', exercises: [] };
+
+  // Group completed sets by exercise for the summary
+  const summaryHTML = routine.exercises.map(ex => {
+    const sets = state.completedSets.filter(s => s.exercise === ex.name);
+    const setsHTML = sets.map((s, i) => `
+      <span class="set-summary-row">Set ${i + 1}: ${s.repsCompleted} reps</span>
+    `).join('');
+
+    return `
+      <div class="end-exercise-summary">
+        <p class="end-ex-name">${ex.name}</p>
+        <div class="set-summary-list">${setsHTML}</div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="end-icon">🎉</div>
+    <h2>Well Done!</h2>
+    <p>You completed <strong>${routine.name}</strong></p>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <p class="stat-num">${state.completedSets.length}</p>
+        <p class="stat-label">Sets Done</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-num">${state.completedSets.reduce((t, s) => t + s.repsCompleted, 0)}</p>
+        <p class="stat-label">Total Reps</p>
+      </div>
+    </div>
+
+    <h3>Your Session</h3>
+    <div class="end-summary">
+      ${summaryHTML}
+    </div>
+
+    <div class="end-actions">
+      <a href="#/progress" class="btn">See Progress</a>
+      <a href="#/routines" class="btn-secondary">Back to Routines</a>
+    </div>
+  `;
+}
+ function LogIn() {
+  if (state.user) {
+    window.location.hash = '#/dashboard';
+    return '';
+  }
+  return `
+    <div class="auth-page">
+      <button id="Back" class="auth-back">← Back</button>
+      <h1 class="auth-title">Login</h1>
+      <input id="username" class="auth-input" placeholder="Username">
+      <input id="password" class="auth-input" type="password" placeholder="Password">
+      <p id="loginError" class="error-text"></p>
+      <button id="loginBtn" class="auth-btn">Login</button>
+      <p class="auth-link">Don't have an account? <a href="#/signup">Sign Up</a></p>
+    </div>
   `;
 }
 
 function SignUp() {
   return `
-    <button id="Back">Back</button>  
-    <h1>Create Account</h1>
-
-    <input id="name" placeholder="Name"> <br><br>
-    <input id="username" placeholder="Username"> <br><br>
-    <input id="email" placeholder="Email"> <br><br>
-    <input id="password" type="password" placeholder="Password"> <br><br>
-    <p id="signupError" style="color:red; font-size:0.85rem;"></p>
-    <button id="signupBtn">Next</button>
-    <p>Already have an account? <a href="#/login">Login</a></p>
+    <div class="auth-page">
+      <button id="Back" class="auth-back">← Back</button>
+      <h1 class="auth-title">Create Account</h1>
+      <input id="name" class="auth-input" placeholder="Name">
+      <input id="username" class="auth-input" placeholder="Username">
+      <input id="email" class="auth-input" placeholder="Email">
+      <input id="password" class="auth-input" type="password" placeholder="Password">
+      <p id="signupError" class="error-text"></p>
+      <button id="signupBtn" class="auth-btn">Next</button>
+      <p class="auth-link">Already have an account? <a href="#/login">Login</a></p>
+    </div>
   `;
 }
 
@@ -322,93 +398,139 @@ function Home() {
     <div class="stats-row">
       <div class="stat-card">
         <p class="stat-num">${thisWeek.length}</p>
-        <p class="stat-label">This Week</p>
+        <p class="stat-label">Workouts this Week</p>
       </div>
       <div class="stat-card">
         <p class="stat-num">${allWorkouts.length}</p>
-        <p class="stat-label">Total Sessions</p>
+        <p class="stat-label">Total Workout Sessions</p>
       </div>
     </div>
     <p class="section-title">Recommended For You</p>
     ${cardsHTML}
     <p style="text-align:center;margin-top:16px;font-size:0.82rem;">
-      <a href="#/about" style="color:#578EA3;font-weight:600;">About BusyCali</a>
-    </p>`;
+      <a href="#/about" class="about-link">About BusyCali</a>
+    </p>
+    
+      `;
 }
 
 
 
 function About() {
   return `
-    <h1>About BusyCali</h1>
-    <p>A calisthenics tracker for busy people. No gym needed.</p>
-    <h3>Features</h3>
-    <ul>
-      >Onboarding to match your level</li>
-      >Pre-built routines</li>
-      >Workout logging</li>
-      >Progress tracking</li>
-      >Works offline — data stored locally</li>
-    </ul>
+    <div class="page about-page">
+      <h2>About BusyCali</h2>
+
+      <div class="about-section">
+        <h3>What is BusyCali?</h3>
+        <p>BusyCali is a calisthenics training app built for people with busy lifestyles. It gives you structured bodyweight routines you can do anywhere. No gym, No equipment required. Track your workouts, monitor your progress, and build real strength at your own pace.</p>
+      </div>
+
+      <div class="about-section">
+        <h3>Who is it Designed for?</h3>
+        <p>BusyCali is for anyone who wants to get fit but struggles to find the time. Whether you're a complete beginner or looking to level up your bodyweight skills, BusyCali adapts to your fitness level and goals through a quick onboarding setup.</p>
+      </div>
+
+      <div class="about-section">
+        <h3>Why Calisthenics?</h3>
+        <p>Calisthenics uses your own bodyweight as resistance, making it one of the most accessible and effective training methods available. It builds functional strength, improves flexibility, and requires minimal space. Perfect for training at home, in a park, or while travelling.</p>
+      </div>
+    </div>
   `;
 }
-
 function Profile() {
   const profile = getProfile(state.user);
   const workouts = getWorkouts(state.user);
-  const user = getUsers()[state.user];
+  const user = getUsers()[state.user] || {};
+
+  // Avatar initials
+  const initials = (user.name || state.user || '?').slice(0, 2).toUpperCase();
 
   return `
-    <h1>${state.user}'s Profile</h1>
-    <p>Email: ${user.email}</p>
-    <p>Total Workouts: ${workouts.length}</p>
-    <p>Level: ${profile.fitnessLevel || 'Not set'}</p>
-    <p>Goal: ${profile.fitnessGoal || 'Not set'}</p>
-    <p>Age: ${profile.age || 'Not set'}</p>
-    <p>Height: ${profile.height || 'Not set'} cm </p>
-    <p>Weight: ${profile.weight || 'Not set'} kg </p>
+    <div class="profile-page">
 
-    <div id="editForm" class="hidden">
-      <input id="editAge" type="number" placeholder="Age" value="${profile.age || ''}"><br><br>
-      <input id="editHeight" type="number" placeholder="Height (cm)" value="${profile.height || ''}"><br><br>
-      <input id="editWeight" type="number" placeholder="Weight (kg)" value="${profile.weight || ''}"><br><br>
-      <button id="saveProfileBtn">Save</button>
+      <div class="profile-avatar">${initials}</div>
+      <p class="profile-name">${user.name || state.user}</p>
+      <p class="profile-email">${user.email || ''}</p>
+
+      <div class="profile-grid">
+        <div class="profile-cell">
+          <p class="profile-cell-label">Level</p>
+          <p class="profile-cell-val">${profile.fitnessLevel || 'Not set'}</p>
+        </div>
+        <div class="profile-cell">
+          <p class="profile-cell-label">Goal</p>
+          <p class="profile-cell-val">${profile.fitnessGoal || 'Not set'}</p>
+        </div>
+        <div class="profile-cell">
+          <p class="profile-cell-label">Age</p>
+          <p class="profile-cell-val">${profile.age || 'Not set'}</p>
+        </div>
+        <div class="profile-cell">
+          <p class="profile-cell-label">Height</p>
+          <p class="profile-cell-val">${profile.height ? profile.height + ' cm' : 'Not set'}</p>
+        </div>
+        <div class="profile-cell">
+          <p class="profile-cell-label">Weight</p>
+          <p class="profile-cell-val">${profile.weight ? profile.weight + ' kg' : 'Not set'}</p>
+        </div>
+        <div class="profile-cell">
+          <p class="profile-cell-label">Workouts</p>
+          <p class="profile-cell-val">${workouts.length}</p>
+        </div>
+      </div>
+
+      <div id="editForm" class="hidden">
+        <input id="editAge" class="auth-input" type="number" placeholder="Age" value="${profile.age || ''}">
+        <input id="editHeight" class="auth-input" type="number" placeholder="Height (cm)" value="${profile.height || ''}">
+        <input id="editWeight" class="auth-input" type="number" placeholder="Weight (kg)" value="${profile.weight || ''}">
+        <button id="saveProfileBtn" class="auth-btn">Save</button>
+      </div>
+
+      <button id="editBtn" class="auth-btn">Edit Profile</button>
+      <button id="logoutBtn" class="big-btn" style="background:transparent;color:var(--primary-dk);border:2px solid var(--primary);margin-top:10px;">Log Out</button>
+
     </div>
-
-    <button id="editBtn">Edit Profile</button>
-    <button id="logoutBtn">Log Out</button>
   `;
 }
 function Progress() {
   const workouts = getWorkouts(state.user);
 
-  // Empty state — no workouts logged yet
   if (workouts.length === 0) {
     return `
       <div class="progress-page">
         <h1>Progress</h1>
         <p>No workouts logged yet!</p>
-        <a href="#/routines">Start your first workout →</a>
+        <a href="#/routines" class="btn">Start your first workout →</a>
       </div>
     `;
   }
 
-  // Calculate this month's workouts
   const now = new Date();
   const thisMonth = workouts.filter(w => {
     const d = new Date(w.date);
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   });
 
-  // Build past session cards
-  const sessionCards = workouts.map(w => `
-    <div class="session-card">
-      <p class="session-name">${w.routineName}</p>
-      <p class="session-date">${new Date(w.date).toLocaleDateString('en-GB')}</p>
-    </div>
-  `).join('');
+  // Session cards — now show sets breakdown
+  const sessionCards = workouts.slice().reverse().map(w => {
+    const setsHTML = (w.completedSets || []).map((s, i) => `
+      <span class="session-set-row">${s.exercise} — Set ${s.set}: ${s.repsCompleted} reps</span>
+    `).join('');
 
-  // Single return with everything
+    return `
+      <div class="session-card">
+        <div class="session-header">
+          <p class="session-name">${w.routineName}</p>
+          <p class="session-date">${new Date(w.date).toLocaleDateString('en-GB')}</p>
+        </div>
+        <div class="session-sets">
+          ${setsHTML}
+        </div>
+      </div>
+    `;
+  }).join('');
+
   return `
     <div class="progress-page">
       <h1>Progress</h1>
@@ -508,13 +630,14 @@ function Routines() {
   const levels = ['All', 'Beginner', 'Intermediate', 'Advanced'];
   const visible = state.routineFilter === 'All'
     ? ROUTINES
-    : ROUTINES.filter(r => r.fitnessLevel === state.routineFilter); 
+    : ROUTINES.filter(r => r.fitnessLevel === state.routineFilter);
+
   return `
     <h2>Routines</h2>
     <div class="filter-btns">
       ${levels.map(l => `
         <button class="filter-btn ${state.routineFilter === l ? 'active' : ''}"
-          data-level="${l}" id="filter${l}">${l}</button>
+          data-level="${l}">${l}</button>
       `).join('')}
     </div>
     ${visible.map(r => `
@@ -523,7 +646,7 @@ function Routines() {
           <p class="routine-name">${r.name}</p>
           <p class="routine-meta">${r.duration} · ${r.fitnessLevel}</p>
         </div>
-        <button class="start-btn btn" data-id="${r.id}">Start</button>
+        <button class="view-btn btn" data-id="${r.id}">View routine</button>
       </div>
     `).join('')}
   `;
@@ -574,13 +697,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', logout);
 const signupBtn = document.getElementById('signupBtn'); 
 if (signupBtn) signupBtn.addEventListener('click', signup);
 
-document.querySelectorAll('.start-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const id = btn.dataset.id;
-    localStorage.setItem('activeWorkout', id);
-    window.location.hash = '#/workout';
-  });
-});
+
 
 document.querySelectorAll('.level-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -635,29 +752,9 @@ if (onbFinish) onbFinish.addEventListener('click', () => {
   window.location.hash = '#/dashboard';
 });
 
-  const nextExercise = document.getElementById('nextExercise');
-  if (nextExercise) nextExercise.addEventListener('click', () => {
-    state.currentExerciseInd++;
-    render();
-  });
+ 
 
-  const finishWorkout = document.getElementById('finishWorkout');
-  if (finishWorkout) finishWorkout.addEventListener('click', () => {
-    const routineID = parseInt(localStorage.getItem('activeWorkout'));
-    const routine = ROUTINES.find(r => r.id === routineID);
-    const newEntry = {
-      date: new Date().toISOString(),
-      routineName: routine.name,
-      exercises: routine.exercises
-    };
-    const workouts = getWorkouts(state.user);
-    workouts.push(newEntry);
-    saveWorkouts(state.user, workouts);
-    state.currentExerciseInd = 0;
-    window.location.hash = '#/progress';
-  });
-
-  const editBtn = document.getElementById('editBtn');
+const editBtn = document.getElementById('editBtn');
 if (editBtn) editBtn.addEventListener('click', () => {
   document.getElementById('editForm').classList.toggle('hidden');
 });
@@ -672,6 +769,96 @@ if (saveProfileBtn) saveProfileBtn.addEventListener('click', () => {
   });
   render();
 });
+
+// View routine — goes to preview
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      localStorage.setItem('activeWorkout', btn.dataset.id);
+      localStorage.setItem('previewMode', 'true');
+      state.currentExerciseInd = 0;
+      state.currentSetInd = 0;
+      state.completedSets = [];
+      window.location.hash = '#/workout';
+    });
+  });
+
+ // Start Workout — clears preview mode, begins active
+  const startWorkoutBtn = document.getElementById('startWorkoutBtn');
+  if (startWorkoutBtn) startWorkoutBtn.addEventListener('click', () => {
+    localStorage.setItem('previewMode', 'false');
+    render();
+  });
+
+  // Active workout — next exercise
+const nextExercise = document.getElementById('nextExercise');
+if (nextExercise) nextExercise.addEventListener('click', () => {
+  state.currentExerciseInd++;
+  render();
+});
+
+
+
+ // Complete Set — saves reps, moves to next set or next exercise
+  const nextSet = document.getElementById('nextSet');
+  if (nextSet) nextSet.addEventListener('click', () => {
+    const routineID = parseInt(localStorage.getItem('activeWorkout'));
+    const routine = ROUTINES.find(r => r.id === routineID);
+    const exercise = routine.exercises[state.currentExerciseInd];
+
+    // Read reps — fall back to target if left blank
+    const repsInput = document.getElementById('repsCompleted');
+    const repsCompleted = parseInt(repsInput.value) || exercise.reps;
+
+    // Save this set
+    state.completedSets.push({
+      exercise: exercise.name,
+      set: state.currentSetInd + 1,
+      repsCompleted
+    });
+
+    // Move to next set or next exercise
+    if (state.currentSetInd < exercise.sets - 1) {
+      state.currentSetInd++;
+    } else {
+      state.currentExerciseInd++;
+      state.currentSetInd = 0;
+    }
+
+    render();
+  });
+
+  // Finish Workout — saves final set, logs to localStorage, goes to end screen
+  const finishWorkout = document.getElementById('finishWorkout');
+  if (finishWorkout) finishWorkout.addEventListener('click', () => {
+    const routineID = parseInt(localStorage.getItem('activeWorkout'));
+    const routine = ROUTINES.find(r => r.id === routineID);
+    const exercise = routine.exercises[state.currentExerciseInd];
+
+    // Save the final set
+    const repsInput = document.getElementById('repsCompleted');
+    const repsCompleted = parseInt(repsInput.value) || exercise.reps;
+    state.completedSets.push({
+      exercise: exercise.name,
+      set: state.currentSetInd + 1,
+      repsCompleted
+    });
+
+    // Build workout entry and save to localStorage
+    const newEntry = {
+      date: new Date().toISOString(),
+      routineName: routine.name,
+      completedSets: state.completedSets
+    };
+    const workouts = getWorkouts(state.user);
+    workouts.push(newEntry);
+    saveWorkouts(state.user, workouts);
+
+    // Reset workout state
+    state.currentExerciseInd = 0;
+    state.currentSetInd = 0;
+
+    window.location.hash = '#/end-workout';
+  });
 }
 
 
