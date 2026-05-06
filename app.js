@@ -201,35 +201,48 @@ function WorkoutView() {
 
   if (!routine) {
     return `
-      <div class="workout-page">
-        <h2>No workout selected</h2>
+      <div style="text-align:center;padding:40px 16px">
+        <p>No workout selected.</p>
         <a href="#/routines">← Back to Routines</a>
-      </div>
-    `;
+      </div>`;
   }
 
   const exercise = routine.exercises[state.currentExerciseInd];
   const isLast = state.currentExerciseInd === routine.exercises.length - 1;
-  const exerciseNum = state.currentExerciseInd + 1;
+  const num = state.currentExerciseInd + 1;
   const total = routine.exercises.length;
 
   return `
-    <div class="workout-page">
-      <div class="workout-header">
-        <p class="workout-routine-name">${routine.name}</p>
-        <p class="workout-counter">${exerciseNum} / ${total}</p>
-      </div>
-      <div class="exercise-card">
-        <h2 class="exercise-name">${exercise.name}</h2>
-        <p class="exercise-sets">${exercise.sets} sets × ${exercise.reps} reps</p>
-      </div>
-      ${isLast
-        ? `<button id="finishWorkout" class="btn btn-primary btn-full">Finish Workout ✓</button>`
-        : `<button id="nextExercise" class="btn btn-primary btn-full">Next Exercise →</button>`
-      }
-      <a href="#/routines" style="display:block; text-align:center; margin-top:16px;">Quit Workout</a>
+    <p class="workout-counter">${routine.name} · Exercise ${num} of ${total}</p>
+    <div class="exercise-card">
+      <p class="exercise-name">${exercise.name}</p>
+      <p class="exercise-detail">${exercise.sets} sets × ${exercise.reps} reps</p>
     </div>
-  `;
+    ${isLast
+      ? `<button class="workout-next-btn" id="finishWorkout">Finish Workout ✓</button>`
+      : `<button class="workout-next-btn" id="nextExercise">Next Exercise →</button>`}
+    <a href="#/routines" class="workout-quit">Quit Workout</a>`;
+}
+
+function EndWorkout() {
+  // shown after finishing a workout
+  const routineID = parseInt(localStorage.getItem('activeWorkout'));
+  const routine = ROUTINES.find(r => r.id === routineID) || { name: 'Workout', exercises: [] };
+  return `
+    <div class="end-page">
+      <div class="end-icon">🎉</div>
+      <h2 class="end-title">Well Done!</h2>
+      <p class="end-sub">You completed ${routine.name}</p>
+      <div class="stats-row" style="justify-content:center;">
+        <div class="stat-card" style="max-width:150px;">
+          <p class="stat-num">${routine.exercises.length}</p>
+          <p class="stat-label">Exercises Done</p>
+        </div>
+      </div>
+      <button class="big-btn" onclick="window.location.hash='#/progress'">See Progress</button>
+      <br><br>
+      <a href="#/routines" style="color:#6891A4;font-size:0.85rem;font-weight:600;display:block;text-align:center;">Back to Routines</a>
+    </div>`;
 }
 
 function LogIn() {
@@ -280,6 +293,11 @@ function Home() {
   startOfWeek.setDate(now.getDate() - now.getDay() + 1);
   startOfWeek.setHours(0, 0, 0, 0);
   const thisWeek = allWorkouts.filter(w => new Date(w.date) >= startOfWeek);
+  
+  // Streak message
+  const streakMsg = thisWeek.length > 0
+    ? `You've trained ${thisWeek.length}x this week. Keep it up!`
+    : `No workouts yet this week. Let's get started!`;
 
   //  recommended routines
   const userLevel = profile.fitnessLevel || 'Beginner';
@@ -298,46 +316,67 @@ function Home() {
   `).join('');
 
   return `
-    <div class="home-page">
-      <h2>${greeting}, ${state.user}!</h2>
-
+       <h2 class="home-greeting">${greeting}, ${state.user}!</h2>
+    <p class="home-sub">Ready for a workout?</p>
+    <div class="streak-banner">  ${streakMsg}</div>
+    <div class="stats-row">
       <div class="stat-card">
-        <p class="stat-label">Workouts this week</p>
         <p class="stat-num">${thisWeek.length}</p>
+        <p class="stat-label">This Week</p>
       </div>
-
-      <h3 class="section-title">Recommended For You</h3>
-      ${cardsHTML}
-
-      ${allWorkouts.length === 0
-        ? `<p class="empty-text">No workouts logged yet. <a href="#/routines">Start training!</a></p>`
-        : `<p class="empty-text">Total sessions logged: ${allWorkouts.length}</p>`
-      }
+      <div class="stat-card">
+        <p class="stat-num">${allWorkouts.length}</p>
+        <p class="stat-label">Total Sessions</p>
+      </div>
     </div>
-  `;
+    <p class="section-title">Recommended For You</p>
+    ${cardsHTML}
+    <p style="text-align:center;margin-top:16px;font-size:0.82rem;">
+      <a href="#/about" style="color:#578EA3;font-weight:600;">About BusyCali</a>
+    </p>`;
 }
+
+
 
 function About() {
   return `
-  <h1>About Page</h1>
-  <div class="about-card">dig</div>
-
-  <div class="about-card">gds</div>
-  
+    <h1>About BusyCali</h1>
+    <p>A calisthenics tracker for busy people. No gym needed.</p>
+    <h3>Features</h3>
+    <ul>
+      >Onboarding to match your level</li>
+      >Pre-built routines</li>
+      >Workout logging</li>
+      >Progress tracking</li>
+      >Works offline — data stored locally</li>
+    </ul>
   `;
 }
+
 function Profile() {
-    if (state.user) {
-    return `
-      <h1> <span style="color: #0593f2;">${state.user}</span>'s Profile</h1>
-      <p> This is the profile page when the user is logged in </p>
-      <button id="logoutBtn">Log Out</button>
-    `;
-  }
+  const profile = getProfile(state.user);
+  const workouts = getWorkouts(state.user);
+  const user = getUsers()[state.user];
 
   return `
-    <h1>Locked</h1>
-    <p>Must be Logged in to view Profile</p>
+    <h1>${state.user}'s Profile</h1>
+    <p>Email: ${user.email}</p>
+    <p>Total Workouts: ${workouts.length}</p>
+    <p>Level: ${profile.fitnessLevel || 'Not set'}</p>
+    <p>Goal: ${profile.fitnessGoal || 'Not set'}</p>
+    <p>Age: ${profile.age || 'Not set'}</p>
+    <p>Height: ${profile.height || 'Not set'} cm </p>
+    <p>Weight: ${profile.weight || 'Not set'} kg </p>
+
+    <div id="editForm" class="hidden">
+      <input id="editAge" type="number" placeholder="Age" value="${profile.age || ''}"><br><br>
+      <input id="editHeight" type="number" placeholder="Height (cm)" value="${profile.height || ''}"><br><br>
+      <input id="editWeight" type="number" placeholder="Weight (kg)" value="${profile.weight || ''}"><br><br>
+      <button id="saveProfileBtn">Save</button>
+    </div>
+
+    <button id="editBtn">Edit Profile</button>
+    <button id="logoutBtn">Log Out</button>
   `;
 }
 function Progress() {
@@ -618,6 +657,21 @@ if (onbFinish) onbFinish.addEventListener('click', () => {
     window.location.hash = '#/progress';
   });
 
+  const editBtn = document.getElementById('editBtn');
+if (editBtn) editBtn.addEventListener('click', () => {
+  document.getElementById('editForm').classList.toggle('hidden');
+});
+
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+if (saveProfileBtn) saveProfileBtn.addEventListener('click', () => {
+  saveProfile(state.user, {
+    ...getProfile(state.user),
+    age: document.getElementById('editAge').value,
+    height: document.getElementById('editHeight').value,
+    weight: document.getElementById('editWeight').value
+  });
+  render();
+});
 }
 
 
