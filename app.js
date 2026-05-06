@@ -143,7 +143,7 @@ const routes = {
 };
 
 // Define protected routes list 
-const protectedRoutes = ['#/dashboard', '#/profile', '#/Home','#/progress', '#/workout', '#/end-workout'];
+const protectedRoutes = ['#/dashboard', '#/profile', '#/routines','#/progress', '#/workout', '#/end-workout'];
 
 function router() {
   const hash = window.location.hash || '#/';
@@ -294,8 +294,8 @@ function EndWorkout() {
   }).join('');
 
   return `
-    <div class="end-icon">🎉</div>
-    <h2>Well Done!</h2>
+    
+    <h2>Well Done! <strong>${state.user}</strong></h2>
     <p>You completed <strong>${routine.name}</strong></p>
 
     <div class="stats-row">
@@ -387,9 +387,29 @@ function Home() {
         <p class="routine-name">${r.name}</p>
         <p class="routine-meta">${r.duration} · ${r.fitnessLevel}</p>
       </div>
-      <button class="btn btn-primary start-btn" data-id="${r.id}">Start</button>
+      <button class="view-btn" data-id="${r.id}">Start</button>
     </div>
   `).join('');
+  
+  const lastWorkout = allWorkouts.length > 0 ? allWorkouts[allWorkouts.length - 1] : null;
+  const lastWorkoutHTML = lastWorkout ? `
+  <p class="section-title">Last Workout</p>
+  <div class="routine-card">
+    <div>
+      <p class="routine-name">${lastWorkout.routineName}</p>
+      <p class="routine-meta">${new Date(lastWorkout.date).toLocaleDateString('en-GB')}</p>
+    </div>
+  </div>
+` : '';
+
+  const quotes = [
+  '<h2>"The body achieves what the mind believes."</h2>',
+  '<h2>"Show up. Do the work."</h2>',
+  '<h2>"Progress, not perfection."</h2>',
+  '<h2>"Every rep counts."</h2>',
+  '<h2>"Take control of your mind AND your body"</h2>'
+];
+const quote = quotes[new Date().getDay() % quotes.length]; 
 
   return `
        <h2 class="home-greeting">${greeting}, ${state.user}!</h2>
@@ -410,6 +430,9 @@ function Home() {
     <p style="text-align:center;margin-top:16px;font-size:0.82rem;">
       <a href="#/about" class="about-link">About BusyCali</a>
     </p>
+    ${lastWorkoutHTML}
+    ${quote}
+    
     
       `;
 }
@@ -533,7 +556,7 @@ function Progress() {
 
   return `
     <div class="progress-page">
-      <h1>Progress</h1>
+      <h2>Progress</h2>
 
       <div class="stats-row">
         <div class="stat-card">

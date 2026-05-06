@@ -280,6 +280,9 @@ button { font-family: 'Montserrat', sans-serif; }
 
 .stat-num { font-size: 2rem; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
 .stat-label { font-size: 0.7rem; color: rgba(255,255,255,0.85); margin: 5px 0 0; font-weight: 600; }
+.streak-banner{
+  font-style:italic;
+} 
 
 /* ── Routines ── */
 .routine-card {
@@ -561,6 +564,8 @@ button { font-family: 'Montserrat', sans-serif; }
 .profile-cell-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; margin: 0 0 3px; }
 .profile-cell-val   { font-size: 0.95rem; font-weight: 800; color: var(--primary-dk); margin: 0; }
 
+.hidden { display: none; }
+
 /* ── About ── */
 .about-logo {
   font-size: 2.4rem;
@@ -593,4 +598,9 @@ button { font-family: 'Montserrat', sans-serif; }
 .about-link {
 color:#578EA3;
 font-weight:600;
+}
+
+/* titles */
+h2 {
+   font-size: 1.5rem; font-weight: 800; color: var(--primary-dk); margin: 0 0 4px;
 }
